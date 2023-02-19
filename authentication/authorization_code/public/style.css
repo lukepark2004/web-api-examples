@@ -1,0 +1,50 @@
+/* Positioning the log in stuff
+*/
+
+#titlename {
+    position: absolute;
+    top: -45px;
+    left: 650px;
+    font-size: 60px;
+}
+
+#loggingintext {
+    position: absolute;
+    top: 50px;
+    right: 700px;
+    background-color: skyblue;
+}
+
+#loginpicture {
+    background-color: red;
+    position: absolute;
+    left: 150px;
+    border: 3px solid black;
+
+}
+
+#emailprint {
+    position: absolute;
+    font-size: 20px;
+    left: 380px;
+    border: 1.5px solid white;
+}
+
+#displayed_name {
+    position: absolute;
+    font-size: 20px;
+    left: 380px;
+    border: 1.5px solid white;
+}
+
+#displayed_name_2 {
+    position: absolute;
+    font-size: 20px;
+    left: 460px;
+    border: 1.5px solid white;
+}
+
+
+
+
+

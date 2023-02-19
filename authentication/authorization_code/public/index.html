@@ -1,142 +1,353 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <title>Example of the Authorization Code flow with Spotify</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-    <style type="text/css">
-      #login, #loggedin {
-        display: none;
-      }
-      .text-overflow {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        width: 500px;
-      }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.108.0">
+    <title>Album example · Bootstrap v5.3</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="index.css">
+
+    <meta name="theme-color" content="#712cf9">
   </head>
-
   <body>
+    
     <div class="container">
-      <div id="login">
-        <h1>This is an example of the Authorization Code flow</h1>
-        <a href="/login" class="btn btn-primary">Log in with Spotify</a>
-      </div>
-      <div id="loggedin">
-        <div id="user-profile">
+        <div id="login">
+          <h1>This is an example of the Authorization Code flow</h1>
+          <a href="/login" class="btn btn-primary">Log in with Spotify</a>
         </div>
-        <div id="oauth">
-        </div>
-        <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
-      </div>
-    </div>
-
-    <script id="user-profile-template" type="text/x-handlebars-template">
-      <h1>Logged in as {{display_name}}</h1>
-      <div class="media">
-        <div class="pull-left">
-          <img class="media-object" width="150" src="{{images.0.url}}" />
-        </div>
-        <div class="media-body">
-          <dl class="dl-horizontal">
-            <dt>Display name</dt><dd class="clearfix">{{display_name}}</dd>
-            <dt>Id</dt><dd>{{id}}</dd>
-            <dt>Email</dt><dd>{{email}}</dd>
-            <dt>Spotify URI</dt><dd><a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a></dd>
-            <dt>Link</dt><dd><a href="{{href}}">{{href}}</a></dd>
-            <dt>Profile Image</dt><dd class="clearfix"><a href="{{images.0.url}}">{{images.0.url}}</a></dd>
-            <dt>Country</dt><dd>{{country}}</dd>
-          </dl>
+        <div id="loggedin">
+          <div id="user-profile">
+          </div>
+          <div id="oauth">
+          </div>
+          
         </div>
       </div>
-    </script>
-
-    <script id="oauth-template" type="text/x-handlebars-template">
-      <h2>oAuth info</h2>
-      <dl class="dl-horizontal">
-        <dt>Access token</dt><dd class="text-overflow">{{access_token}}</dd>
-        <dt>Refresh token</dt><dd class="text-overflow">{{refresh_token}}</dd>
-      </dl>
-    </script>
-
-    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-    <script>
-      (function() {
-
-        /**
-         * Obtains parameters from the hash of the URL
-         * @return Object
-         */
-        function getHashParams() {
-          var hashParams = {};
-          var e, r = /([^&;=]+)=?([^&;]*)/g,
-              q = window.location.hash.substring(1);
-          while ( e = r.exec(q)) {
-             hashParams[e[1]] = decodeURIComponent(e[2]);
+  
+      <div id="chatbox">
+        <div id="chatlogs">
+          <div class="chat self">
+            <p>Generate playlist:</p>
+          </div>
+        </div>
+        <input type="text" id="occasion" placeholder="What's the occasion?" value = ""/>
+        <input type="text" id="vibe" placeholder="What's the vibe?" value = ""/>
+        <input type="text" id="count" placeholder="What's the count?" value = "20"/>
+        <button id = "generate" onclick="generatePlaylist()" value = "clicked">auxify</button>
+      </div>
+      <script>
+        
+      
+  
+        chatinput = document.getElementById("occasion");
+        const chatvibe = document.getElementById("vibe");
+        const chatcount = document.getElementById("count");
+        const chatlogs = document.getElementById("chatlogs");
+    
+        function generatePlaylist() {
+          
+            
+          // User hit enter, send message to ChatGPT
+  
+          // Create chat message element
+          const occasion = chatinput.value;
+          const displayquery = chatinput.value = "generating a " + chatvibe.value + " playlist for " + chatinput.value + " with " + chatcount.value + " songs...";
+          chatinput.value = "generate me a " + chatvibe.value + " playlist for " + chatinput.value + " with " + chatcount.value + " songs with no duplicates in csv form: title, artist;";
+          const chatMessage = document.createElement("div");
+          chatMessage.classList.add("chat");
+          chatMessage.classList.add("self");
+          chatMessage.innerHTML = `<p>${displayquery}</p>`;
+          chatlogs.appendChild(chatMessage);
+  
+          // Call OpenAI API
+          fetch(`https://api.openai.com/v1/completions`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer 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"
+            },
+            body: JSON.stringify({
+              prompt: chatinput.value,
+              max_tokens: 2048,
+              temperature: 0,
+              model: "text-davinci-003"
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            // Create chat message element
+            
+            document.getElementById("gptoutput").value = data.choices[0].text;
+            convertCsvToArray();
+  
+            const chatMessage = document.createElement("div");
+            chatMessage.classList.add("chat");
+            chatMessage.classList.add("other");
+            chatMessage.innerHTML = `<p>success</p>`;
+            chatlogs.appendChild(chatMessage);
+  
+            // Scroll to bottom
+            chatlogs.scrollTop = chatlogs.scrollHeight;
+          });
+  
+          chatinput.value = occasion;
+  
+        
+        
+        };
+      </script>
+    
+      <script>
+        function convertCsvToArray() {
+          const csv = document.getElementById("gptoutput").value.replace(/['"]+/g, '');
+          const lines = csv.split(";");
+          const result = [];
+          for (let i = 0; i < lines.length; i++) {
+            if (lines[i] != "") {
+              const values = lines[i].split(',');
+              result.push(values);
+            }
           }
-          return hashParams;
+          document.getElementById("songarray").value = result;
+          createPlaylist()
+          
         }
-
-        var userProfileSource = document.getElementById('user-profile-template').innerHTML,
-            userProfileTemplate = Handlebars.compile(userProfileSource),
-            userProfilePlaceholder = document.getElementById('user-profile');
-
-        var oauthSource = document.getElementById('oauth-template').innerHTML,
-            oauthTemplate = Handlebars.compile(oauthSource),
-            oauthPlaceholder = document.getElementById('oauth');
-
-        var params = getHashParams();
-
-        var access_token = params.access_token,
-            refresh_token = params.refresh_token,
-            error = params.error;
-
-        if (error) {
-          alert('There was an error during the authentication');
-        } else {
-          if (access_token) {
-            // render oauth info
-            oauthPlaceholder.innerHTML = oauthTemplate({
-              access_token: access_token,
-              refresh_token: refresh_token
-            });
-
-            $.ajax({
-                url: 'https://api.spotify.com/v1/me',
-                headers: {
-                  'Authorization': 'Bearer ' + access_token
-                },
-                success: function(response) {
-                  userProfilePlaceholder.innerHTML = userProfileTemplate(response);
-
-                  $('#login').hide();
-                  $('#loggedin').show();
-                }
-            });
-          } else {
-              // render initial screen
-              $('#login').show();
-              $('#loggedin').hide();
-          }
-
-          document.getElementById('obtain-new-token').addEventListener('click', function() {
-            $.ajax({
-              url: '/refresh_token',
-              data: {
-                'refresh_token': refresh_token
+      </script>
+  
+  
+      <script id="user-profile-template" type="text/x-handlebars-template">
+        <h1>Logged in as {{display_name}}</h1>
+          
+        <div class="media">
+          <div class="pull-left">
+            <img class="media-object" width="150" src="{{images.0.url}}" />
+          
+        </div>
+      </script>
+  
+      <script id="oauth-template" type="text/x-handlebars-template">
+        
+      </script>
+      <p id="penis" value = "test"></p>  
+      <p id="vagina" value = "alex_gooo"></p>  
+      <p id="playlistid" value = "test"></p>
+      <p id="songarray" value = "test"></p>
+      <p id="gptoutput" value = "test"></p>
+  
+      <script >
+        function createPlaylist() {
+          var accessToken = document.getElementById("penis").value;
+          var name = document.getElementById("occasion").value;
+          var desc = "A " + document.getElementById("vibe").value + " playlist for " + document.getElementById("occasion").value + " generated with auxify";
+          var userId = "alex_gooo";
+          fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              name: name,
+              description: desc,
+              public: false // Set to true if you want the playlist to be public
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log('New playlist created:', data);
+            document.getElementById("playlistid").value = data.id;
+            addSongsToPlaylist();
+          })
+          .catch(error => console.error('Error creating playlist:', error));
+        }
+  
+        function addSongsToPlaylist() {
+          var accessToken = document.getElementById("penis").value;
+          var playlistId = document.getElementById("playlistid").value;
+          var songs = document.getElementById("songarray").value;
+          const trackUris = [];
+  
+          songs.forEach(song => {
+            const [songName, artist, trash] = song;
+            const query = `track:${songName} artist:${artist}`;
+  
+            fetch(`https://api.spotify.com/v1/search?type=track&q=${encodeURIComponent(query)}`, {
+              headers: {
+                'Authorization': `Bearer ${accessToken}`
               }
-            }).done(function(data) {
-              access_token = data.access_token;
+            })
+            .then(response => response.json())
+            .then(data => {
+              const track = data.tracks.items[0];
+  
+              if (track) {
+                trackUris.push(track.uri);
+              } else {
+                console.error(`Unable to find track: ${songName} by ${artist}`);
+              }
+  
+              if (trackUris.length === songs.length) {
+                // Add tracks to playlist
+                fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    uris: trackUris
+                  })
+                })
+                .then(response => response.json())
+                .then(data => console.log('Added songs to playlist:', data))
+                .catch(error => console.error('Error adding songs to playlist:', error));
+              }
+            })
+            .catch(error => console.error('Error searching for track:', error));
+          });
+        }
+  
+      </script>
+  
+      <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
+      <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+      <script>
+        (function() {
+  
+          /**
+           * Obtains parameters from the hash of the URL
+           * @return Object
+           */
+          function getHashParams() {
+            var hashParams = {};
+            var e, r = /([^&;=]+)=?([^&;]*)/g,
+                q = window.location.hash.substring(1);
+            while ( e = r.exec(q)) {
+               hashParams[e[1]] = decodeURIComponent(e[2]);
+            }
+            return hashParams;
+          }
+  
+          var userProfileSource = document.getElementById('user-profile-template').innerHTML,
+              userProfileTemplate = Handlebars.compile(userProfileSource),
+              userProfilePlaceholder = document.getElementById('user-profile');
+  
+          var oauthSource = document.getElementById('oauth-template').innerHTML,
+              oauthTemplate = Handlebars.compile(oauthSource),
+              oauthPlaceholder = document.getElementById('oauth');
+  
+          var params = getHashParams();
+  
+          var access_token = params.access_token,
+              refresh_token = params.refresh_token,
+              error = params.error;
+          document.getElementById("penis").value = access_token;
+          if (error) {
+            alert('There was an error during the authentication');
+          } else {
+            if (access_token) {
+              // render oauth info
               oauthPlaceholder.innerHTML = oauthTemplate({
                 access_token: access_token,
                 refresh_token: refresh_token
               });
-            });
-          }, false);
-        }
-      })();
-    </script>
+  
+              $.ajax({
+                  url: 'https://api.spotify.com/v1/me',
+                  headers: {
+                    'Authorization': 'Bearer ' + access_token
+                  },
+                  success: function(response) {
+                    userProfilePlaceholder.innerHTML = userProfileTemplate(response);
+  
+                    $('#login').hide();
+                    $('#loggedin').show();
+                  }
+              });
+            } else {
+                // render initial screen
+                $('#login').show();
+                $('#loggedin').hide();
+            }
+  
+            document.getElementById('obtain-new-token').addEventListener('click', function() {
+              $.ajax({
+                url: '/refresh_token',
+                data: {
+                  'refresh_token': refresh_token
+                }
+              }).done(function(data) {
+                access_token = data.access_token;
+                oauthPlaceholder.innerHTML = oauthTemplate({
+                  access_token: access_token,
+                  refresh_token: refresh_token
+                });
+              });
+            }, false);
+          }
+        })();
+      </script>
+
+<main>
+  <section class="py-5 text-center container">
+    <div class="row py-lg-5">
+      <div class="col-lg-6 col-md-8 mx-auto">
+
+          <div class="row">
+            <div class="col-md-12 text-center">
+              <h3 id = "aux" class="animate-charcter"> AUXIFY</h3>
+            </div>
+          </div>
+
+        <p><span class = "bolded">Redefining music sharing and listening experiences.</span><p>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="album py-5 bg-light">
+    <div class="container">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        <div class="col">
+          <div class="card shadow-sm">
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DXdQvOLqzNHSW?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card shadow-sm">
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcyiNvJqewCy?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card shadow-sm">
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1EIgzSCNweQzPQ?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="text-muted py-5">
+  <div class="container">
+    <p class="float-end mb-1">
+      <a href="#">Back to top</a>
+    </p>
+    <p class="mb-1">Album example is &copy; Bootstrap, but please download and customize it for yourself!</p>
+    <p class="mb-0">New to Bootstrap? <a href="/">Visit the homepage</a> or read our <a href="/docs/5.3/getting-started/introduction/">getting started guide</a>.</p>
+  </div>
+</footer>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+
+      
   </body>
 </html>
-
